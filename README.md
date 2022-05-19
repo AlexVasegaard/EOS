@@ -1,6 +1,12 @@
  # EOS
 EOS is a set of functions (intended to be a package) that encompases everything within a centralized Earth Observation Satellite scheduling system in terms of Scenario generation, problem setup, solution approach, decision maker preference integration.
 
+The DM preferences are introduced through a plethora of Scoring approaches available:
+- modified ELECTRE-III (ordinal)
+- topsis (ordinal)
+- WSA (ordinal)
+all scoring approaches contain representative variables to elicited information as opposed to using pairwise evaluations.
+
 the two main functions are multi_sat_data() and multi_sat_testing(). 
 
 the package dependencies are:
@@ -34,4 +40,22 @@ It takes in the following arguments:
 - map_generation = True %whether a visualisation should be generated
 
 ## multi_sat_testing() 
-takes in the following arguments
+This function contains both the preference integration part (scoring) and the solution approach.
+It takes in the following arguments:
+- scoring_method (can be 1 = TOPSIS, 2 = ELECTRE, 3 = naive scoring method WSA)
+- solution_method (can be "gurobi", "PuLP", "cplex", or "DAG")  
+- criteria_weights (relevant for TOPSIS, ELECTRE, and WSA), e.g. np.array([1,0,1,0,0,0,1,1,1])
+- threshold_parameters (relevant for ELECTRE), e.g. np.array([[0, 2, 2, 0, 0,0,0,0],[50,5,5,5,1, 1000, 0, 2], [1000, 40, 40, 15, 2, 10000, 13, 5]])
+- alpha a scalar, it is the factor with which scores are taken to the power of. It basically represent the level with which one trusts the average score - it supplies the DM with ratio evaluation ability. Default value is 1 meaning this is negleted.
+
+Note, the order with which criteria are presented in the criteria weights and threshold_parameters arguments are:
+- area, 
+- angle, 
+- sun elevation, 
+- cloud cover, 
+- priority, 
+- price, 
+- age, 
+- uncertainty
+
+#please let me know if you have any suggestions (good or bad) to the code, any comments are highly appreciated :-) 
