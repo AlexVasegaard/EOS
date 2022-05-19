@@ -7,6 +7,8 @@ The DM preferences are introduced through a plethora of Scoring approaches avail
 - WSA (ordinal)
 all scoring approaches contain representative variables to elicited information as opposed to using pairwise evaluations.
 
+![alt text](https://www.google.com/url?sa=i&url=https%3A%2F%2Flink.springer.com%2Farticle%2F10.1007%2Fs10696-022-09444-z&psig=AOvVaw2y0LlNOMQoCN3jn9fA5unf&ust=1653052839244000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCJC1yPLT6_cCFQAAAAAdAAAAABAD)
+
 the two main functions are multi_sat_data() and multi_sat_testing(). 
 
 the package dependencies are:
