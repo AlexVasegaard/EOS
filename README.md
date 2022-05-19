@@ -58,4 +58,4 @@ Note, the order with which criteria are presented in the criteria weights and th
 - age, 
 - uncertainty
 
-#please let me know if you have any suggestions (good or bad) to the code, any comments are highly appreciated :-) 
+### PLEASE let me know if you have any suggestions (good or bad) to the code - any comments are highly appreciated :-) 
