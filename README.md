@@ -1,5 +1,5 @@
  # EOS
-EOS is a set of functions (intended to be a package) that encompases everything within a centralized Earth Observation Satellite scheduling system in terms of Scenario generation, problem setup, solution approach, decision maker preference integration.
+EOS is a set of functions (intended to be a package) that encompases everything within a centralized Earth Observation Satellite scheduling system in terms of Scenario generation, pre-processing, problem setup, solution approach, decision maker preference integration, and visualization.
 
 The DM preferences are introduced through a plethora of Scoring approaches available:
 - modified ELECTRE-III (ordinal)
