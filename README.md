@@ -1,7 +1,37 @@
-# EOS
+ # EOS
 EOS is a set of functions (intended to be a package) that encompases everything within a centralized Earth Observation Satellite scheduling system in terms of Scenario generation, problem setup, solution approach, decision maker preference integration.
 
 the two main functions are multi_sat_data() and multi_sat_testing(). 
 
+the package dependencies are:
+- numpy, pandas, datetime, requests, random, ephem, math, folium (for a visual html map output), time, scipy, progressbar, ast, timeit 
+
+and depending on whether a free optimization method is used (api may be required):
+- cvxopt, gurobipy, pulp, docplex
+
+Real satellite paths are introduced trough their TLE (Go to www.celestrak.com to obtain TLEs, default are Spot 6,7 and Pleiades A and B)
+Also, there is an option to obtain realtime, historic, or generate weather data (cloud coverage) when generating the scenario. 
+
 ## multi_sat_data() 
+Generates the problem, so it functions as a general pre-processing for the EOS system. 
+It is seeded so problem scenarios can be replicated across different environments and therefore utilized for evaluating different solution approaches.
+Note, it isnt optimized for speed yet, so it will run rather slow.
+
+It takes in the following arguments: 
+- seconds_gran = 20 %The discretisation level of the satellitel path (discrete optimization problem) 
+- number_of_requests_0 = 1000, %customer requests in database initially (there is an option to contionously add customers to mimic the effect of a real EOS production where new customers are entering and one over time still wants to ensure that requests doesnt violate an age threshold) 
+- NORAD_ids = [38755, 40053]  %TLEs for spot 6 and 7 satellites
+- weather_real = False, %whether real cloud coverage data is utilized for the chosen time horizon
+- simplify = True, #whether constraints are simplified
+- schedule_start = [2021,7,21,9,40],  %time of initiation for the schedule horizon
+- hours_horizon = 8, %duration of planning horizon in hours
+- max_off_nadir_angle = 30, %degrees that satellite can maneuver (or is allowed to still acquire pictures) 
+- height_satellite = 694,   %altitude of satellites (in km) - this is in next iteration updated to automatically be calculated 
+- rotation_speed = 30/12, %degrees per second - per https://directory.eoportal.org/web/eoportal/satellite-missions/s/spot-6-7
+- cam_resolution = 1, %m^2 per pixel
+- capacity_limit = 1000000, %in mega byte
+- satellite_swath = 3600, &swath of satellite images 
+- map_generation = True %whether a visualisation should be generated
+
+## multi_sat_testing() 
 takes in the following arguments
