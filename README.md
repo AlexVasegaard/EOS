@@ -41,6 +41,16 @@ It takes in the following arguments:
 - satellite_swath = 3600, &swath of satellite images 
 - map_generation = True %whether a visualisation should be generated
 
+AND outputs the following:
+ - multi_sat_data.LPP is the Linear programming problem Ax<=b where LPP contains:
+   - LPP.LHS - A in the Ax<b
+   - LPP.RHS - b in the Ax<b
+   - LPP.eLHS - A in the Ax=b
+   - LPP.eRHS - b in the Ax=b
+ - multi_sat_data.df is the data frame containing all information for the entire problem scenario (for each attempt)
+ - multi_sat_data.pf_df is the performance data frame for the relevant (reachable) image attempts
+ - multi_sat_data.m is the folium map with relevant problem scenario information
+
 ## multi_sat_testing() 
 This function contains both the preference integration part (scoring) and the solution approach.
 It takes in the following arguments:
@@ -59,5 +69,10 @@ Note, the order with which criteria are presented in the criteria weights and th
 - price, 
 - age, 
 - uncertainty
+
+AND outputs the following:
+ - multi_sat_testing.x is the binary solution vector illustrating which attempts should be acquired and which should be neglected
+ - multi_sat_testing.score is the generated score for each attempt through the introduced preference setting
+ - multi_sat_testing.time is the runtime for the solution approach
 
 ### PLEASE let me know if you have any suggestions (good or bad) to the code - any comments are highly appreciated :-) 
