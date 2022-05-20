@@ -30,7 +30,7 @@ It takes in the following arguments:
 - number_of_requests_0 = 1000, %customer requests in database initially (there is an option to contionously add customers to mimic the effect of a real EOS production where new customers are entering and one over time still wants to ensure that requests doesnt violate an age threshold) 
 - NORAD_ids = [38755, 40053]  %TLEs for spot 6 and 7 satellites
 - weather_real = False, %whether real cloud coverage data is utilized for the chosen time horizon
-- simplify = False, #whether constraints are simplified based on the principle of inter set constraints
+- simplify = False, #whether constraints are simplified based on the principle of inter set constraints - IT IS ONLY VALID IF a LPP solution approach is used.
 - schedule_start = [2021,7,21,9,40],  %time of initiation for the schedule horizon
 - hours_horizon = 8, %duration of planning horizon in hours
 - max_off_nadir_angle = 30, %degrees that satellite can maneuver (or is allowed to still acquire pictures) 
