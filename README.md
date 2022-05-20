@@ -30,8 +30,12 @@ pip install EOSpython
 ### example
 ```python
 import EOSpython
-x_data = multi_sat_data(seconds_gran=10, number_of_requests_0=1000, NORAD_ids=satellite_norad_IDs, weather_real = False, simplify = False)
-x_res1 = multi_sat_testing(scoring_method=2, solution_method = "DAG", LPP = x_data.LPP, DF_i = x_data.df, performance_df = x_data.pf_df, criteria_weights = np.array([0,0,0,0,0,0,1,0]), threshold_parameters= np.array([[0,0,1000],[0,0,40],[0,0,40],[0,0,15],[0,0,4],[0,0,20000],[0,0,1], [0,0,1]]), alpha = 1)
+x_data = multi_sat_data(seconds_gran=10, number_of_requests_0=1000, 
+                        NORAD_ids=[38755, 40053], weather_real = False)
+x_res1 = multi_sat_testing(scoring_method=2, solution_method = "DAG", 
+                           LPP = x_data.LPP, DF_i = x_data.df, performance_df = x_data.pf_df, 
+                           criteria_weights = np.array([0,0,0,0,0,0,1,0]), 
+                           threshold_parameters= np.array([[0,0,1000],[0,0,40],[0,0,40],[0,0,15],[0,0,4],[0,0,20000],[0,0,1], [0,0,1]]))
 visualize(x_data, x_res1, 'EOS_example')
 ```
 
@@ -72,8 +76,8 @@ It takes in the following arguments:
 - scoring_method (can be 1 = TOPSIS, 2 = ELECTRE, 3 = naive scoring method WSA)
 - solution_method (can be "gurobi", "PuLP", "cplex", or "DAG")  
 - criteria_weights (relevant for TOPSIS, ELECTRE, and WSA), e.g. np.array([1,0,1,0,0,0,1,1,1])
-- threshold_parameters (relevant for ELECTRE), e.g. np.array([[0, 2, 2, 0, 0,0,0,0],[50,5,5,5,1, 1000, 0, 2], [1000, 40, 40, 15, 2, 10000, 13, 5]])
-- alpha a scalar, it is the factor with which scores are taken to the power of. It basically represent the level with which one trusts the average score - it supplies the DM with ratio evaluation ability. Default value is 1 meaning this is negleted.
+- threshold_parameters (relevant for ELECTRE), e.g. np.array([[0,0,1000],[0,0,40],[0,0,40],[0,0,15],[0,0,4],[0,0,20000],[0,0,1], [0,0,1]]) Note, it is the indifference, preference, and veto threshold variables assigned for each criteria.
+- alpha a scalar, it is the factor with which scores are taken to the power of. It basically represent the level with which one trusts the computed score - it supplies the DM with ratio evaluation ability. Default value is 1 meaning this is negleted.
 
 Note, the order with which criteria are presented in the criteria weights and threshold_parameters arguments are:
 - area, 
