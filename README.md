@@ -20,6 +20,20 @@ and depending on whether a free optimization method is used (api may be required
 Real satellite paths are introduced trough their TLE (Go to www.celestrak.com to obtain TLEs, default are Spot 6,7 and Pleiades A and B)
 Also, there is an option to obtain realtime, historic, or generate weather data (cloud coverage) when generating the scenario. 
 
+## Usage
+
+### install 
+´´
+pip install EOSpython
+´´
+### example
+´´
+import EOSpython
+x_data = multi_sat_data(seconds_gran=10, number_of_requests_0=1000, NORAD_ids=satellite_norad_IDs, weather_real = False, simplify = False)
+x_res1 = multi_sat_testing(scoring_method=2, solution_method = "DAG", LPP = x_data.LPP, DF_i = x_data.df, performance_df = x_data.pf_df, criteria_weights = np.array([0,0,0,0,0,0,1,0]), threshold_parameters= np.array([[0,0,1000],[0,0,40],[0,0,40],[0,0,15],[0,0,4],[0,0,20000],[0,0,1], [0,0,1]]), alpha = 1)
+visualize(x_data, x_res1, 'EOS_example')
+´´
+
 ## multi_sat_data() 
 Generates the problem, so it functions as a general pre-processing for the EOS system. 
 It is seeded so problem scenarios can be replicated across different environments and therefore utilized for evaluating different solution approaches.
