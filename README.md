@@ -9,10 +9,10 @@ all scoring approaches contain representative variables to elicited information 
 
 ![alt text](single_scenario_map.PNG)
 
-the two main functions are multi_sat_data() and multi_sat_testing(). 
+the three main functions are multi_sat_data(), multi_sat_testing(), and visualize(). 
 
 the package dependencies are:
-- numpy, pandas, datetime, requests, random, ephem, math, folium (for a visual html map output), time, scipy, progressbar, ast, timeit 
+- numpy, pandas, datetime, requests, random, ephem, math, folium (for a visual html map output), time, scipy, progressbar, ast, timeit, copy
 
 and depending on whether a free optimization method is used (api may be required):
 - cvxopt, gurobipy, pulp, docplex
@@ -74,5 +74,18 @@ AND outputs the following:
  - multi_sat_testing.x is the binary solution vector illustrating which attempts should be acquired and which should be neglected
  - multi_sat_testing.score is the generated score for each attempt through the introduced preference setting
  - multi_sat_testing.time is the runtime for the solution approach
+
+## visualize()
+This funciton puts out an html file in the designated folder containing a folium map of the problem instance and the solution obtained.
+It takes in the following arguments:
+ - x_data which is the resulting output from the multi_sat_data() function
+ - x_res which is the resulting output from the multi_sat_testing() function
+ - name_of_html takes in a string for the name of the html file. Default is 'EOSpython'
+
+The Output is a saved file in the working folder. 
+
+Note, the visualize builds on the map, which is build in the scenario generation function multi_sat_data(). 
+It makes a deep copy of the html and is therefore possible to run for multiple different solution schemes.
+
 
 ### PLEASE let me know if you have any suggestions (good or bad) to the code - any comments are highly appreciated :-) 
