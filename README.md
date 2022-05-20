@@ -23,12 +23,12 @@ Also, there is an option to obtain realtime, historic, or generate weather data 
 ## Usage
 
 ### install 
-```
+```python
 pip install EOSpython
 ```
 
 ### example
-```
+```python
 import EOSpython
 x_data = multi_sat_data(seconds_gran=10, number_of_requests_0=1000, NORAD_ids=satellite_norad_IDs, weather_real = False, simplify = False)
 x_res1 = multi_sat_testing(scoring_method=2, solution_method = "DAG", LPP = x_data.LPP, DF_i = x_data.df, performance_df = x_data.pf_df, criteria_weights = np.array([0,0,0,0,0,0,1,0]), threshold_parameters= np.array([[0,0,1000],[0,0,40],[0,0,40],[0,0,15],[0,0,4],[0,0,20000],[0,0,1], [0,0,1]]), alpha = 1)
