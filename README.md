@@ -28,10 +28,10 @@ Note, it isnt optimized for speed yet, so it will run rather slow.
 It takes in the following arguments: 
 - seconds_gran = 20 %The discretisation level of the satellitel path (discrete optimization problem) 
 - number_of_requests_0 = 1000, %customer requests in database initially (there is an option to contionously add customers to mimic the effect of a real EOS production where new customers are entering and one over time still wants to ensure that requests doesnt violate an age threshold) 
-- NORAD_ids = [38755, 40053]  %TLEs for spot 6 and 7 satellites
+- NORAD_ids a list of the chosen satellite TLEs. Default is [38755, 40053]  %TLEs for spot 6 and 7 satellites
 - weather_real = False, %whether real cloud coverage data is utilized for the chosen time horizon
 - simplify = False, #whether constraints are simplified based on the principle of inter set constraints - IT IS ONLY VALID IF a LPP solution approach is used.
-- schedule_start = [2021,7,21,9,40],  %time of initiation for the schedule horizon
+- schedule_start is time of initiation for the schedule horizon. A list of the date entities expressing [year, month, day, hour, minute]. The default is [2021,7,21,9,40].
 - hours_horizon = 8, %duration of planning horizon in hours
 - max_off_nadir_angle = 30, %degrees that satellite can maneuver (or is allowed to still acquire pictures) 
 - height_satellite = 694,   %altitude of satellites (in km) - this is in next iteration updated to automatically be calculated 
