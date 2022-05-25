@@ -5,7 +5,15 @@ The DM preferences are introduced through a plethora of Scoring approaches avail
 - modified ELECTRE-III (ordinal)
 - topsis (ordinal)
 - WSA (ordinal)
-all scoring approaches contain representative variables to elicited information as opposed to using pairwise evaluations.
+Note, all scoring approaches contain representative variables to elicited information as opposed to using pairwise evaluations.
+
+And the solution procedure can be one of the following:
+ - GLPK (Large scale LPP solver from cvxopt - does not require API)
+ - ELPA (an extended longest path algorithm that can manage extremely large problem scenarios - does not require API)
+ - gurobi (large scale LPP solver from gurobi - REQUIRES API)
+ - PuLP (large scale LPP solver from PuLP - REQUIRES API)
+ - Random greedy approach (can manage large scale problems, but performs very poorly - only really applicable to showcase complexity)
+Note, some problem scnearios are too large for the LPP solvers to manage. 
 
 ![alt text](single_scenario_map.PNG)
 
@@ -30,12 +38,35 @@ pip install EOSpython
 ### example
 ```python
 import EOSpython
+
+sat_TLEs = [38755, 40053]
+
+                       #w
+criteria_w = np.array([0.05,      #area
+                       0.1,       #off-nadir angle
+                       0.1,       #sun elevation
+                       0.2,       #cloud coverage 
+                       0.2,       #priority
+                       0.1,       #price
+                       0.2,       #age
+                       0.05])     #uncertainty
+
+                #q,  p,   v
+qpv = np.array([[0,  30,  1000],        #area
+                [0,  2,   40],          #off-nadir angle
+                [0,  10,  40],          #sun elevation
+                [0,  2,   15],          #cloud coverage 
+                [0,  1,   4],           #priority
+                [0,  100, 20000],       #price
+                [0,  4,   10],          #age
+                [0,  0.5,   1]])        #uncertainty
+
 x_data = multi_sat_data(seconds_gran=10, number_of_requests_0=1000, 
-                        NORAD_ids=[38755, 40053], weather_real = False)
+                        NORAD_ids=sat_TLEs, weather_real = False)
 x_res1 = multi_sat_testing(scoring_method=2, solution_method = "DAG", 
                            LPP = x_data.LPP, DF_i = x_data.df, performance_df = x_data.pf_df, 
-                           criteria_weights = np.array([0,0,0,0,0,0,1,0]), 
-                           threshold_parameters= np.array([[0,0,1000],[0,0,40],[0,0,40],[0,0,15],[0,0,4],[0,0,20000],[0,0,1], [0,0,1]]))
+                           criteria_weights = criteria_w, 
+                           threshold_parameters= qpv)
 visualize(x_data, x_res1, 'EOS_example')
 ```
 
@@ -107,4 +138,16 @@ Note, the visualize builds on the map, which is build in the scenario generation
 It makes a deep copy of the html and is therefore possible to run for multiple different solution schemes.
 
 
-### PLEASE let me know if you have any suggestions (good or bad) to the code - any comments are highly appreciated :-) 
+### PLEASE let me know if you have any suggestions (good or bad) to the code - any comments are highly appreciated :-) In terms of added capabilities, I am currently considering:
+ - allowing integration of user specified customer database
+ - integrate a larger plethora of solution approaches:
+    - NSGA-II
+    - NSGA-III
+    - other greedy approaches?
+ - added visualization traits
+ - added evaluation metrics
+ - allow usage of evaluation approaches outside of main functions, e.g. for usage in weight and threshold value elicitation
+Again, if any of these have your interest, please reach out!
+
+
+
