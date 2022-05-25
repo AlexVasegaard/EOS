@@ -135,7 +135,7 @@ It takes in the following arguments:
 The Output is a saved file in the working folder. 
 
 Note, the visualize builds on the map, which is build in the scenario generation function multi_sat_data(). 
-It makes a deep copy of the html and is therefore possible to run for multiple different solution schemes.
+It is not possible to either build a deep copy of the html file or sequentially add feature groups in the folium package and it is therefore not possible sequentially run multiple different solution schemes without the former computed solution still being visible in the map - The capabiolity of changing the color on the acquisition in multi_sat_testing() is therefore added. Note, this is hopefully being improved for next update.
 
 
 ### PLEASE let me know if you have any suggestions (good or bad) to the code - any comments are highly appreciated :-) In terms of added capabilities, I am currently considering:
