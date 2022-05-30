@@ -5,6 +5,7 @@ The DM preferences are introduced through a plethora of Scoring approaches avail
 - modified ELECTRE-III (ordinal)
 - topsis (ordinal)
 - WSA (ordinal)
+
 Note, all scoring approaches contain representative variables to elicited information as opposed to using pairwise evaluations.
 
 And the solution procedure can be one of the following:
@@ -13,6 +14,7 @@ And the solution procedure can be one of the following:
  - gurobi (large scale LPP solver from gurobi - REQUIRES API)
  - PuLP (large scale LPP solver from PuLP - REQUIRES API)
  - Random greedy approach (can manage large scale problems, but performs very poorly - only really applicable to showcase complexity)
+
 Note, some problem scnearios are too large for the LPP solvers to manage. 
 
 ![alt text](single_scenario_map.PNG)
@@ -152,6 +154,7 @@ This function provides a quick deeper evaluation functionality (than the total s
  - number of priority 2 requests
  - number of priority 3 requests
  - number of priority 4 requests
+
 Note, average is often a bad metric in this case, as a few very bad performing acquisitions can hide behind a larger set of requests. A better metric is therefore to look at quantiles or certain benchmarks and how many acquisitions with that profile was able to be captured.
 
 ## Improvements or suggestions
@@ -165,11 +168,12 @@ Note, average is often a bad metric in this case, as a few very bad performing a
  - added evaluation metrics
  - allow usage of evaluation approaches outside of main functions, e.g. for usage in weight and threshold value elicitation
  - improve visualization to e.g. showcase operational criteria also (cloud cover, sun elevation)
+
 Again, if any of these have your interest, please reach out!
 
 
 
-## Appendix
+# Appendix
 In this section, some of the assumptions of the pre-processing is explained.
 the distribution of the request database is mainly landbased requests, as these mimic the high and low concentration areas that can occur in an EOS setting, and in the scheduling we are (more or less) only interested in the high distribution areas - as of why the marine requests are omitted. The database is created based on the population density of the earth, and assumes therefore that EOS imagery requests mimic the same density map. See the below figure for one instance:
 
