@@ -111,14 +111,18 @@ def construct_performance_df(df, seconds_gran, location_slots, time_slots, dista
     performance_df = performance_df.drop(performance_df[performance_df["sun elevation"] < 0].index)
     performance_df = performance_df.reset_index(drop =True)
     
-    def cloud_gen(lat, long, parameter):
-        lat1 = np.cos((((lat+90)/180))*40)
-        long1 = np.cos((((long+180)/360))*30)
-        lat2 = np.cos((((lat+90)/180))*20)
-        long2 = np.cos((((long+180)/360))*40)
-        cloud = ((lat1*long1 + lat2*long2+1)/2)*100 # it now has a range from -50 to 150
-        #cloud = (((lat1 * long1 + lat2*long2 + 2)  / (3.4)) -(4-3.4)/3.4)*100  #to mimic scewedness! 
-        cloud_stoc1 = cloud + parameter*random.randint(-10,10)
+    def cloud_gen(lat, long, parameter, alpha = 3, beta =4.5):
+        lat1 = np.cos(((lat+90)/180)*20) #to mimic higher around equator and one upper and lower quantile
+        long1 = np.cos(((long+180)/360)*50)
+        lat2 = np.cos(((lat+90)/180)*50)
+        long2 = np.cos(((long+180)/360)*30)
+        lat3 = np.cos(((lat+90)/180)*100)
+        long3 = np.cos(((long+180)/360)*80)
+
+        cloud = (((3*lat1 *long1 + 1.5*lat1 + 2*lat2*long2 + 1*lat3*long3)*100/8 + 70)*2 -150)/1.5 # it now has a range from -50 to 150
+        #cloud = 110-(((lat1 * long1 + lat2*long2 + 2)  / (alpha)) -(beta-alpha)/beta)*110 #to mimic scewedness! 
+        #cloud_stoc2=cloud
+        cloud_stoc1 = cloud + parameter*random.randint(-10,10) #to generate bias in both ends
         cloud_stoc2 = max(min(cloud_stoc1 + random.randint(-5,5),100),0)
         return(cloud_stoc2)
         
