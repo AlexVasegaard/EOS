@@ -77,7 +77,7 @@ Note, it isnt optimized for speed yet, so it will run rather slow.
 
 It takes in the following arguments: 
 - seconds_gran = 20 %The discretisation level of the satellitel path (discrete optimization problem) 
-- number_of_requests_0 = 1000, %customer requests in database initially (there is an option to contionously add customers to mimic the effect of a real EOS production where new customers are entering and one over time still wants to ensure that requests doesnt violate an age threshold) 
+- number_of_requests_0 = 1000, %customer requests in database initially (there is an option to contionously add customers to mimic the effect of a real EOS production where new customers are entering and one over time still wants to ensure that requests doesnt violate an age threshold. The customers are generated based on location distribution which is higher around urbanized areas - this should mimic the actual customer database that EOS companies see or at least mimic the density of requests that optimization problems face.) 
 - NORAD_ids a list of the chosen satellite TLEs. Default is [38755, 40053]  %TLEs for spot 6 and 7 satellites
 - weather_real = False, %whether real cloud coverage data is utilized for the chosen time horizon
 - simplify = False, #whether constraints are simplified based on the principle of inter set constraints - IT IS ONLY VALID IF a LPP solution approach is used.
@@ -90,6 +90,8 @@ It takes in the following arguments:
 - capacity_limit = 1000000, %in mega byte
 - satellite_swath = 3600, &swath of satellite images 
 - map_generation = True %whether a visualisation should be generated
+Note, the scenarios consist of requests with stereo, strip requirements, which is modeled by the constraints. 
+For a request to be considered we have defined certain thresholds, namely a maximum cloud coverage of 50 pct, 
 
 AND outputs the following:
  - multi_sat_data.LPP is the Linear programming problem Ax<=b where LPP contains:
@@ -137,7 +139,21 @@ The Output is a saved file in the working folder.
 Note, the visualize builds on the map, which is build in the scenario generation function multi_sat_data(). 
 It is not possible to either build a deep copy of the html file or sequentially add feature groups in the folium package and it is therefore not possible sequentially run multiple different solution schemes without the former computed solution still being visible in the map - The capabiolity of changing the color on the acquisition in multi_sat_testing() is therefore added. Note, this is hopefully being improved for next update.
 
+## evaluate()
+This function provides a quick deeper evaluation functionality (than the total score and number of acquisitions provided in the sat_testing() function). The metrics that is showcased are respectively:
+ - average cloud coverage
+ - average sun elevation
+ - average depointing angle
+ - total profit
+ - total area captured
+ - average priority
+ - number of priority 1 requests
+ - number of priority 2 requests
+ - number of priority 3 requests
+ - number of priority 4 requests
+Note, average is often a bad metric in this case, as a few very bad performing acquisitions can hide behind a larger set of requests. A better metric is therefore to look at quantiles or certain benchmarks and how many acquisitions with that profile was able to be captured.
 
+## Improvements or suggestions
 ### PLEASE let me know if you have any suggestions (good or bad) to the code - any comments are highly appreciated :-) In terms of added capabilities, I am currently considering:
  - allowing integration of user specified customer database
  - integrate a larger plethora of solution approaches:
@@ -147,6 +163,7 @@ It is not possible to either build a deep copy of the html file or sequentially 
  - added visualization traits
  - added evaluation metrics
  - allow usage of evaluation approaches outside of main functions, e.g. for usage in weight and threshold value elicitation
+ - improve visualization to e.g. showcase operational criteria also (cloud cover, sun elevation)
 Again, if any of these have your interest, please reach out!
 
 
