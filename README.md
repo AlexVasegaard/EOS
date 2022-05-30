@@ -70,6 +70,11 @@ x_res1 = multi_sat_testing(scoring_method=2, solution_method = "DAG",
                            criteria_weights = criteria_w, 
                            threshold_parameters= qpv)
 visualize(x_data, x_res1, 'EOS_example')
+
+df = evaluate(x_data, x_res1)
+
+print(df.solution)
+print(df.scenario)
 ```
 
 ## multi_sat_data() 
@@ -144,16 +149,34 @@ It is not possible to either build a deep copy of the html file or sequentially 
 
 ## evaluate()
 This function provides a quick deeper evaluation functionality (than the total score and number of acquisitions provided in the sat_testing() function). The metrics that is showcased are respectively:
- - average cloud coverage
- - average sun elevation
- - average depointing angle
- - total profit
- - total area captured
- - average priority
- - number of priority 1 requests
- - number of priority 2 requests
- - number of priority 3 requests
- - number of priority 4 requests
+ - scenario specific metrics:
+   - number of attempts
+   - number of unique requests
+   - number of constraints in the LPP
+   - average angle on attempts
+   - average prices 
+   - average sun elevation (is more interesting for non-global scenarios)
+   - average cloud cover 
+   - average priority
+
+ - Solution specific metrics
+  - total acquisiitons
+  - total profit
+  - average cloud coverage
+  - acqusitions with good cloud cover (<10)
+  - acqusitions with bad cloud cover (>30)
+  - average depointing angle
+  - acquisitions with good off-nadir angle (<10)
+  - acqusitions with bad off-nadir angle (>30)
+  - average priority
+  - priority 1 acquisitions
+  - priority 2 acquisitions
+  - priority 3 acquisitions
+  - priority 4 acquisitions
+  - average sun elevation
+  - total area captured
+
+they can be accesed thrugh the evaluation.scenario and evaluation.solution output, respectively.
 
 Note, average is often a bad metric in this case, as a few very bad performing acquisitions can hide behind a larger set of requests. A better metric is therefore to look at quantiles or certain benchmarks and how many acquisitions with that profile was able to be captured.
 
