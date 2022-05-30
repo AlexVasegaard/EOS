@@ -1125,3 +1125,72 @@ def multi_sat_testing(scoring_method, solution_method, LPP, DF_i, performance_df
         multi_sat_testing.score = score
         multi_sat_testing.time = end_time
         return(multi_sat_testing)
+    
+   
+ 
+def visualize(x_data, x_res, name_of_html = 'EOSpython', color = 'black'):
+    #plot multi sat scenario and solution
+    import numpy as np
+    import folium
+    #import copy
+    performance_df = x_data.pf_df
+    schedules = x_res.x
+    a = x_data.m
+    idx_acqs = np.where(schedules)[0]
+    points_entire = list()
+    
+    for i in range(0,int(np.sum(schedules))):
+        index_line = idx_acqs[i]
+        points = list()
+        points.append(tuple(performance_df.iloc[index_line, 4]))
+        points.append(tuple(performance_df.iloc[index_line, 5])) 
+        #print(index_line, points)
+        
+        points_entire.append(points)
+        
+    folium.PolyLine(points_entire, color=color, weight=2.5, opacity=1).add_to(a)
+    
+    a.save(name_of_html + ".html")
+
+
+def evaluate(x_data, x_res):
+    import numpy as np
+    import pandas as pd
+    
+    #scenario generation specific evalation metrics
+    atts_m = int(len(x_data.pf_df))
+    reqss_m = int(len(np.unique(x_data.pf_df['ID'])))
+    constraintss_m = int(x_data.LPP.eRHS.shape[0] + x_data.LPP.RHS.shape[0])
+    angles_m = np.mean(x_data.pf_df['angle'])
+    areas_m = np.mean(x_data.pf_df['area'])
+    prices_m = np.mean(x_data.pf_df['price'])
+    sun_elevations_m = np.mean(x_data.pf_df['sun elevation'])
+    ccs_m = np.mean(x_data.pf_df['cloud cover real'])
+    prio_m = np.mean(x_data.pf_df['priority'])
+    
+    
+    #solution specific metrics
+    acq = int(np.sum(x_res.x))
+    profit = np.sum(x_data.pf_df['price'].iloc[np.where(x_res.x)])
+    avg_cloud = np.mean(x_data.pf_df['cloud cover real'].iloc[np.where(x_res.x)])
+    cloud_good = int(np.sum(x_data.pf_df['cloud cover real'].iloc[np.where(x_res.x)]<10))
+    cloud_bad = int(np.sum(x_data.pf_df['cloud cover real'].iloc[np.where(x_res.x)]>30))
+    avg_angle = np.mean(x_data.pf_df['angle'].iloc[np.where(x_res.x)])
+    angle_good = int(np.sum(x_data.pf_df['angle'].iloc[np.where(x_res.x)]<=10))
+    angle_bad = int(np.sum(x_data.pf_df['angle'].iloc[np.where(x_res.x)]>=30))
+    avg_priority = np.mean(x_data.pf_df['priority'].iloc[np.where(x_res.x)])
+    priority1 = int(np.sum(x_data.pf_df['priority'].iloc[np.where(x_res.x)]==1))
+    priority2 = int(np.sum(x_data.pf_df['priority'].iloc[np.where(x_res.x)]==2))
+    priority3 = int(np.sum(x_data.pf_df['priority'].iloc[np.where(x_res.x)]==3))
+    priority4 = int(np.sum(x_data.pf_df['priority'].iloc[np.where(x_res.x)]==4))
+    sunelevation = np.mean(x_data.pf_df['sun elevation'].iloc[np.where(x_res.x)])
+    totalarea =  np.sum(x_data.pf_df['area'].iloc[np.where(x_res.x)])
+    
+    evaluate.scenario = pd.DataFrame({'metric':['attempts', 'requests', 'constraints', 'avg angle', 'avg area', 'avg price', 'avg sun elevation', 'avg cloud cover', 'avg priority'],
+                                 'value':[atts_m, reqss_m, constraintss_m, angles_m, areas_m, prices_m, sun_elevations_m, ccs_m, prio_m]})
+
+
+    evaluate.solution = pd.DataFrame({'metric':['acquisitions', 'total profit', 'avg cloud cover', 'cloud cover < 10', 'cloud cover > 30', 'avg angle', 'angle < 10', 'angle > 30', 'avg priority', 'priority 1', 'priority 2', 'priority 3', 'priority 4', 'avg sun elevation', 'total area'],
+                                 'value':[acq, profit, avg_cloud, cloud_good, cloud_bad, avg_angle, angle_good, angle_bad, avg_priority, priority1, priority2, priority3, priority4, sunelevation, totalarea]})
+
+    return(evaluate)
