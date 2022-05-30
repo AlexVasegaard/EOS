@@ -177,6 +177,4 @@ the distribution of the request database is mainly landbased requests, as these 
 
 In the event that the OWM api keys (and the corresponding subscription to gain access to enough weather data acquitions) are not acquired, then the free option of generating cloud cover observations can be utilised in the weather_real=False argument of the multi_sat_data() functionality. This cloud cover generation generates cloud cover data based on a three level cos function. This is done due to the locality and temporal considerations that apply to the cloud cover of image requests. The output mimics some of the landbased cloud cover metrics that are presented on the NASA cloud report (https://earthobservatory.nasa.gov/images/85843/cloudy-earth), where e.g. 30 pct are close to cloud free observations and a third has to be disregarded due to more than 50 pct cloud coverge. The distribution can be seen below.
 
-![alt text](cloud_gen.png)
-
-![alt text](cloud_dist.png)
+![alt text](cloud_gen.png)     ![alt text](cloud_dist.png)
