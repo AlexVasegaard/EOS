@@ -75,6 +75,7 @@ Generates the problem, so it functions as a general pre-processing for the EOS s
 It is seeded so problem scenarios can be replicated across different environments and therefore utilized for evaluating different solution approaches.
 Note, it isnt optimized for speed yet, so it will run rather slow.
 
+
 It takes in the following arguments: 
 - seconds_gran = 20 %The discretisation level of the satellitel path (discrete optimization problem) 
 - number_of_requests_0 = 1000, %customer requests in database initially (there is an option to contionously add customers to mimic the effect of a real EOS production where new customers are entering and one over time still wants to ensure that requests doesnt violate an age threshold. The customers are generated based on location distribution which is higher around urbanized areas - this should mimic the actual customer database that EOS companies see or at least mimic the density of requests that optimization problems face.) 
@@ -168,3 +169,14 @@ Again, if any of these have your interest, please reach out!
 
 
 
+## Appendix
+In this section, some of the assumptions of the pre-processing is explained.
+the distribution of the request database is mainly landbased requests, as these mimic the high and low concentration areas that can occur in an EOS setting, and in the scheduling we are (more or less) only interested in the high distribution areas - as of why the marine requests are omitted. The database is created based on the population density of the earth, and assumes therefore that EOS imagery requests mimic the same density map. See the below figure for one instance:
+
+![alt text](generated_requests_start.PNG)
+
+In the event that the OWM api keys (and the corresponding subscription to gain access to enough weather data acquitions) are not acquired, then the free option of generating cloud cover observations can be utilised in the weather_real=False argument of the multi_sat_data() functionality. This cloud cover generation generates cloud cover data based on a three level cos function. This is done due to the locality and temporal considerations that apply to the cloud cover of image requests. The output mimics some of the landbased cloud cover metrics that are presented on the NASA cloud report (https://earthobservatory.nasa.gov/images/85843/cloudy-earth), where e.g. 30 pct are close to cloud free observations and a third has to be disregarded due to more than 50 pct cloud coverge. The distribution can be seen below.
+
+![alt text](cloud_gen.PNG)
+
+![alt text](cloud_dist.PNG)
