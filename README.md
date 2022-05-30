@@ -173,10 +173,10 @@ Again, if any of these have your interest, please reach out!
 In this section, some of the assumptions of the pre-processing is explained.
 the distribution of the request database is mainly landbased requests, as these mimic the high and low concentration areas that can occur in an EOS setting, and in the scheduling we are (more or less) only interested in the high distribution areas - as of why the marine requests are omitted. The database is created based on the population density of the earth, and assumes therefore that EOS imagery requests mimic the same density map. See the below figure for one instance:
 
-![alt text](generated_requests_start.PNG)
+![alt text](generated_requests_start.png)
 
 In the event that the OWM api keys (and the corresponding subscription to gain access to enough weather data acquitions) are not acquired, then the free option of generating cloud cover observations can be utilised in the weather_real=False argument of the multi_sat_data() functionality. This cloud cover generation generates cloud cover data based on a three level cos function. This is done due to the locality and temporal considerations that apply to the cloud cover of image requests. The output mimics some of the landbased cloud cover metrics that are presented on the NASA cloud report (https://earthobservatory.nasa.gov/images/85843/cloudy-earth), where e.g. 30 pct are close to cloud free observations and a third has to be disregarded due to more than 50 pct cloud coverge. The distribution can be seen below.
 
-![alt text](cloud_gen.PNG)
+![alt text](cloud_gen.png)
 
-![alt text](cloud_dist.PNG)
+![alt text](cloud_dist.png)
