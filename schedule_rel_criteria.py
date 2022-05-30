@@ -21,9 +21,8 @@ def schedule_criteria(number_of_requests, total_days, number_of_requests_0, sate
     req_loc = list()
     divisions=8
     total_request_div = int(total_request/divisions)
-    data_location_which = 4 #-2 = updated article, -1 = reviewved article, 0=article, 1 = ukraine airbus, 3 = world normal, 4 = world concentrated
-    
-     
+    data_location_which = 4 #-2 = updated article, -1 = reviewved article, 0=article, 1 = imaging over eastern europe, 3 = world normal, 4 = world concentrated
+
     
     
     if data_location_which == 4: 
@@ -240,12 +239,11 @@ def schedule_criteria(number_of_requests, total_days, number_of_requests_0, sate
         req_duration[i] = uniform(2,8)
     req_duration = list(req_duration)
     
-    #original priority fitting to airbus distribution of eastern europe
+    
     if (data_location_which in [-2, -1, 0, 3, 4]): #article
         req_pri = list()
-        population = [1, 2, 3, 4]               #population = [1, 2, 3, 4, 5, 6, 7]
-        weights = [0.25, 0.25, 0.25, 0.25]  #weights = [0.13, 0.18, 0.5, 0.1, 0.206, 0.22, 0.157]
-        #weights = [0.023, 0.018, 0.005, 0.1, 0.646, 0.152, 0.057]
+        population = [1, 2, 3, 4]               
+        weights = [0.25, 0.25, 0.25, 0.25]  
         for i in range(total_request):
             req_pri.append(choices(population, weights)[0])
         
@@ -266,14 +264,7 @@ def schedule_criteria(number_of_requests, total_days, number_of_requests_0, sate
                 req_mod_type.append(2)
                 req_mod_pri.append(4)
 
-    if data_location_which == 1 : #airbus
-        req_pri = list()
-        population = [1, 2, 3, 4, 5, 6, 7]
-        #weights = [0.13, 0.18, 0.5, 0.1, 0.206, 0.22, 0.157]
-        weights = [0.013, 0.018, 0.005, 0.1, 0.646, 0.152, 0.057]
-        for i in range(total_request):
-            req_pri.append(choices(population, weights)[0])
-        
+    
         #modified priority and customertype fitting to electre framework
         req_mod_pri = list() 
         req_mod_type = list()
@@ -304,12 +295,7 @@ def schedule_criteria(number_of_requests, total_days, number_of_requests_0, sate
     req_price = list()
     for i in range(total_request):
         req_price.append(randint(500,1500))
-    #zero profit for priority 1 
-    #for j in list(np.where(np.array(req_mod_pri)==1)[0]):
-    #    req_price[j] = 0  #100000000
-    #if data_location_which == 1: #airbus and T2
-    #    for j in list(np.where(np.array(req_mod_pri)==2)[0]):
-    #        req_price[j] = 0  #1000000
+    
     
     
     df = pd.DataFrame({ "ID"                    : req_ID ,
