@@ -40,6 +40,8 @@ pip install EOSpython
 ### example
 ```python
 import EOSpython
+import pandas as pd
+import numpy as np
 
 sat_TLEs = [38755, 40053]
 
