@@ -19,7 +19,7 @@ Note, some problem scnearios are too large for the LPP solvers to manage.
 
 ![alt text](single_scenario_map.PNG)
 
-the three main functions are multi_sat_data(), multi_sat_testing(), and visualize(). 
+the four main functions are EOSscenario(), EOSsolve(), EOSvisualize(), and EOSevaluate(). 
 
 the package dependencies are:
 - numpy, pandas, datetime, requests, random, ephem, math, folium (for a visual html map output), time, scipy, progressbar, ast, timeit, copy
@@ -28,7 +28,7 @@ and depending on whether a free optimization method is used (api may be required
 - cvxopt, gurobipy, pulp, docplex
 
 Real satellite paths are introduced trough their TLE (Go to www.celestrak.com to obtain TLEs, default are Spot 6,7 and Pleiades A and B)
-Also, there is an option to obtain realtime, historic, or generate weather data (cloud coverage) when generating the scenario. 
+Also, there is an option to obtain realtime, historic, or generate weather data (cloud coverage) when generating the scenario, this does however require an API key from OpenWeatherMap.org. 
 
 ## Usage
 
@@ -65,21 +65,21 @@ qpv = np.array([[0,  30,  1000],        #area
                 [0,  4,   10],          #age
                 [0,  0.5,   1]])        #uncertainty
 
-x_data = multi_sat_data(seconds_gran=10, number_of_requests_0=1000, 
+x_data = EOSscenario(seconds_gran=10, number_of_requests_0=1000, 
                         NORAD_ids=sat_TLEs, weather_real = False)
-x_res1 = multi_sat_testing(scoring_method=2, solution_method = "DAG", 
+x_res1 = EOSsolve(scoring_method=2, solution_method = "DAG", 
                            LPP = x_data.LPP, DF_i = x_data.df, performance_df = x_data.pf_df, 
                            criteria_weights = criteria_w, 
                            threshold_parameters= qpv)
-visualize(x_data, x_res1, 'EOS_example')
+EOSvisualize(x_data, x_res1, 'EOS_example')
 
-df = evaluate(x_data, x_res1)
+df = EOSevaluate(x_data, x_res1)
 
 print(df.solution)
 print(df.scenario)
 ```
 
-## multi_sat_data() 
+## EOSscenario() 
 Generates the problem, so it functions as a general pre-processing for the EOS system. 
 It is seeded so problem scenarios can be replicated across different environments and therefore utilized for evaluating different solution approaches.
 Note, it isnt optimized for speed yet, so it will run rather slow.
@@ -113,7 +113,7 @@ AND outputs the following:
  - multi_sat_data.pf_df is the performance data frame for the relevant (reachable) image attempts
  - multi_sat_data.m is the folium map with relevant problem scenario information
 
-## multi_sat_testing() 
+## EOSsolve() 
 This function contains both the preference integration part (scoring) and the solution approach.
 It takes in the following arguments:
 - scoring_method (can be 1 = TOPSIS, 2 = ELECTRE, 3 = naive scoring method WSA)
@@ -137,7 +137,7 @@ AND outputs the following:
  - multi_sat_testing.score is the generated score for each attempt through the introduced preference setting
  - multi_sat_testing.time is the runtime for the solution approach
 
-## visualize()
+## EOSvisualize()
 This funciton puts out an html file in the designated folder containing a folium map of the problem instance and the solution obtained.
 It takes in the following arguments:
  - x_data which is the resulting output from the multi_sat_data() function
@@ -149,7 +149,7 @@ The Output is a saved file in the working folder.
 Note, the visualize builds on the map, which is build in the scenario generation function multi_sat_data(). 
 It is not possible to either build a deep copy of the html file or sequentially add feature groups in the folium package and it is therefore not possible sequentially run multiple different solution schemes without the former computed solution still being visible in the map - The capabiolity of changing the color on the acquisition in multi_sat_testing() is therefore added. Note, this is hopefully being improved for next update.
 
-## evaluate()
+## EOSevaluate()
 This function provides a quick deeper evaluation functionality (than the total score and number of acquisitions provided in the sat_testing() function). The metrics that is showcased are respectively:
  - scenario specific metrics:
    - number of attempts
