@@ -40,8 +40,8 @@ pip install EOSpython
 ### example
 ```python
 import EOSpython
-import pandas as pd
-import numpy as np
+import pandas as pd                        #The evaluation output is presented as a pd dataframe
+import numpy as np                         #The preference structure is given in numpy arrays
 
 sat_TLEs = [38755, 40053]
 
