@@ -39,7 +39,7 @@ pip install EOSpython
 
 ### example
 ```python
-import EOSpython
+from EOSpython import EOS
 import pandas as pd                        #The evaluation output is presented as a pd dataframe
 import numpy as np                         #The preference structure is given in numpy arrays
 
@@ -65,15 +65,15 @@ qpv = np.array([[0,  30,  1000],        #area
                 [0,  4,   10],          #age
                 [0,  0.5,   1]])        #uncertainty
 
-x_data = EOSscenario(seconds_gran=10, number_of_requests_0=1000, 
+x_data = EOS.scenario(seconds_gran=10, number_of_requests_0=1000, 
                         NORAD_ids=sat_TLEs, weather_real = False)
-x_res1 = EOSsolve(scoring_method=2, solution_method = "DAG", 
+x_res1 = EOS.solve(scoring_method=2, solution_method = "DAG", 
                            LPP = x_data.LPP, DF_i = x_data.df, performance_df = x_data.pf_df, 
                            criteria_weights = criteria_w, 
                            threshold_parameters= qpv)
-EOSvisualize(x_data, x_res1, 'EOS_example')
+EOS.visualize(x_data, x_res1, 'EOS_example')
 
-df = EOSevaluate(x_data, x_res1)
+df = EOS.evaluate(x_data, x_res1)
 
 print(df.solution)
 print(df.scenario)
@@ -112,6 +112,8 @@ AND outputs the following:
  - multi_sat_data.df is the data frame containing all information for the entire problem scenario (for each attempt)
  - multi_sat_data.pf_df is the performance data frame for the relevant (reachable) image attempts
  - multi_sat_data.m is the folium map with relevant problem scenario information
+
+Two html map objects will be saved in your working directory for inspection, all_requests.html and sat_path.html, respectively. (THIS FEATURE SHOULD MAYBE BE REMOVED?)
 
 ## EOSsolve() 
 This function contains both the preference integration part (scoring) and the solution approach.
