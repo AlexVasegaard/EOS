@@ -19,9 +19,9 @@ Note, some problem scnearios are too large for the LPP solvers to manage.
 
 ![alt text](single_scenario_map.PNG)
 
-the four main functions are EOSscenario(), EOSsolve(), EOSvisualize(), and EOSevaluate(). 
+The four main functions are EOSscenario(), EOSsolve(), EOSvisualize(), and EOSevaluate() - an explanation for the functions are given below. 
 
-the package dependencies are:
+The package dependencies are:
 - numpy, pandas, datetime, requests, random, ephem, math, folium (for a visual html map output), time, scipy, progressbar, ast, timeit, copy
 
 and depending on whether a free optimization method is used (api may be required):
