@@ -79,7 +79,7 @@ print(df.solution)
 print(df.scenario)
 ```
 
-## EOSscenario() 
+## EOS.scenario() 
 Generates the problem, so it functions as a general pre-processing for the EOS system. 
 It is seeded so problem scenarios can be replicated across different environments and therefore utilized for evaluating different solution approaches.
 Note, it isnt optimized for speed yet, so it will run rather slow.
@@ -115,7 +115,7 @@ AND outputs the following:
 
 Two html map objects will be saved in your working directory for inspection, all_requests.html and sat_path.html, respectively. (THIS FEATURE SHOULD MAYBE BE REMOVED?)
 
-## EOSsolve() 
+## EOS.solve() 
 This function contains both the preference integration part (scoring) and the solution approach.
 It takes in the following arguments:
 - scoring_method (can be 1 = TOPSIS, 2 = ELECTRE, 3 = naive scoring method WSA)
@@ -139,7 +139,7 @@ AND outputs the following:
  - multi_sat_testing.score is the generated score for each attempt through the introduced preference setting
  - multi_sat_testing.time is the runtime for the solution approach
 
-## EOSvisualize()
+## EOS.visualize()
 This funciton puts out an html file in the designated folder containing a folium map of the problem instance and the solution obtained.
 It takes in the following arguments:
  - x_data which is the resulting output from the multi_sat_data() function
@@ -151,7 +151,7 @@ The Output is a saved file in the working folder.
 Note, the visualize builds on the map, which is build in the scenario generation function multi_sat_data(). 
 It is not possible to either build a deep copy of the html file or sequentially add feature groups in the folium package and it is therefore not possible sequentially run multiple different solution schemes without the former computed solution still being visible in the map - The capabiolity of changing the color on the acquisition in multi_sat_testing() is therefore added. Note, this is hopefully being improved for next update.
 
-## EOSevaluate()
+## EOS.evaluate()
 This function provides a quick deeper evaluation functionality (than the total score and number of acquisitions provided in the sat_testing() function). The metrics that is showcased are respectively:
  - scenario specific metrics:
    - number of attempts
