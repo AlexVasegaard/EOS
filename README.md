@@ -100,7 +100,7 @@ It takes in the following arguments:
 - capacity_limit = 1000000, %in mega byte
 - satellite_swath = 3600, &swath of satellite images 
 - map_generation = True %whether a visualisation should be generated
-- API_key = list of strings with API key(s) for OpenWeatherMap.org
+- API_key = list of strings with API key(s) for OpenWeatherMap.org for weather forecasts and for historic api.weatherbit.io
 
 Note, the scenarios consist of requests with stereo, strip requirements, which is modeled by the constraints. 
 For a request to be considered we have defined certain thresholds, namely a maximum cloud coverage of 50 pct, 
@@ -122,8 +122,8 @@ This function contains both the preference integration part (scoring) and the so
 It takes in the following arguments:
 - scoring_method (can be 1 = TOPSIS, 2 = ELECTRE, 3 = naive scoring method WSA)
 - solution_method (can be "gurobi", "PuLP", "cplex", or "DAG")  
-- criteria_weights (relevant for TOPSIS, ELECTRE, and WSA), e.g. np.array([1,0,1,0,0,0,1,1,1])
-- threshold_parameters (relevant for ELECTRE), e.g. np.array([[0,0,1000],[0,0,40],[0,0,40],[0,0,15],[0,0,4],[0,0,20000],[0,0,1], [0,0,1]]) Note, it is the indifference, preference, and veto threshold variables assigned for each criteria.
+- criteria_weights (relevant for TOPSIS, ELECTRE, and WSA), [1,0,1,0,0,0,1,1,1])
+- threshold_parameters (relevant for ELECTRE), e.g. np.array([[0,0,1000],[0,0,40],[0,0,40],[0,0,15],[0,0,4],[0,0,20000],[0,0,1], [0,0,1]] Note, it is the indifference, preference, and veto threshold variables assigned for each criteria.
 - alpha a scalar, it is the factor with which scores are taken to the power of. It basically represent the level with which one trusts the computed score - it supplies the DM with ratio evaluation ability. Default value is 1 meaning this is negleted.
 - API_key = string of API key for solvers (if they are necessary s.a.for CPLEX.
 
