@@ -100,6 +100,8 @@ It takes in the following arguments:
 - capacity_limit = 1000000, %in mega byte
 - satellite_swath = 3600, &swath of satellite images 
 - map_generation = True %whether a visualisation should be generated
+- API_key = list of strings with API key(s) for OpenWeatherMap.org
+
 Note, the scenarios consist of requests with stereo, strip requirements, which is modeled by the constraints. 
 For a request to be considered we have defined certain thresholds, namely a maximum cloud coverage of 50 pct, 
 
@@ -123,6 +125,7 @@ It takes in the following arguments:
 - criteria_weights (relevant for TOPSIS, ELECTRE, and WSA), e.g. np.array([1,0,1,0,0,0,1,1,1])
 - threshold_parameters (relevant for ELECTRE), e.g. np.array([[0,0,1000],[0,0,40],[0,0,40],[0,0,15],[0,0,4],[0,0,20000],[0,0,1], [0,0,1]]) Note, it is the indifference, preference, and veto threshold variables assigned for each criteria.
 - alpha a scalar, it is the factor with which scores are taken to the power of. It basically represent the level with which one trusts the computed score - it supplies the DM with ratio evaluation ability. Default value is 1 meaning this is negleted.
+- API_key = string of API key for solvers (if they are necessary s.a.for CPLEX.
 
 Note, the order with which criteria are presented in the criteria weights and threshold_parameters arguments are:
 - area, 
@@ -180,7 +183,7 @@ This function provides a quick deeper evaluation functionality (than the total s
   - average sun elevation
   - total area captured
 
-they can be accesed thrugh the evaluation.scenario and evaluation.solution output, respectively.
+OUTPUT: They can be accesed thrugh the evaluate.scenario and evaluate.solution output, respectively.
 
 Note, average is often a bad metric in this case, as a few very bad performing acquisitions can hide behind a larger set of requests. A better metric is therefore to look at quantiles or certain benchmarks and how many acquisitions with that profile was able to be captured.
 
