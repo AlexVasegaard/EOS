@@ -45,25 +45,25 @@ import numpy as np                         #The preference structure is given in
 
 sat_TLEs = [38755, 40053]
 
-                       #w
-criteria_w = np.array([0.05,      #area
-                       0.1,       #off-nadir angle
-                       0.1,       #sun elevation
-                       0.2,       #cloud coverage 
-                       0.2,       #priority
-                       0.1,       #price
-                       0.2,       #age
-                       0.05])     #uncertainty
+               #w
+criteria_w =  [0.05,      #area
+               0.1,       #off-nadir angle
+               0.1,       #sun elevation
+               0.2,       #cloud coverage 
+               0.2,       #priority
+               0.1,       #price
+               0.2,       #age
+               0.05])     #uncertainty
 
-                #q,  p,   v
-qpv = np.array([[0,  30,  1000],        #area
-                [0,  2,   40],          #off-nadir angle
-                [0,  10,  40],          #sun elevation
-                [0,  2,   15],          #cloud coverage 
-                [0,  1,   4],           #priority
-                [0,  100, 20000],       #price
-                [0,  4,   10],          #age
-                [0,  0.5,   1]])        #uncertainty
+       #q,  p,   v
+qpv = [[0,  30,  1000],        #area
+       [0,  2,   40],          #off-nadir angle
+       [0,  10,  40],          #sun elevation
+       [0,  2,   15],          #cloud coverage 
+       [0,  1,   4],           #priority
+       [0,  100, 20000],       #price
+       [0,  4,   10],          #age
+       [0,  0.5,   1]])        #uncertainty
 
 x_data = EOS.scenario(seconds_gran=10, number_of_requests_0=1000, 
                         NORAD_ids=sat_TLEs, weather_real = False)
