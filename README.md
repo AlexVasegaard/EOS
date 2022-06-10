@@ -53,7 +53,7 @@ criteria_w =  [0.05,      #area
                0.2,       #priority
                0.1,       #price
                0.2,       #age
-               0.05])     #uncertainty
+               0.05]      #uncertainty
 
        #q,  p,   v
 qpv = [[0,  30,  1000],        #area
@@ -63,14 +63,14 @@ qpv = [[0,  30,  1000],        #area
        [0,  1,   4],           #priority
        [0,  100, 20000],       #price
        [0,  4,   10],          #age
-       [0,  0.5,   1]])        #uncertainty
+       [0,  0.5,   1]]         #uncertainty
 
 x_data = EOS.scenario(seconds_gran=10, number_of_requests_0=1000, 
-                        NORAD_ids=sat_TLEs, weather_real = False)
-x_res1 = EOS.solve(scoring_method=2, solution_method = "DAG", 
-                           LPP = x_data.LPP, DF_i = x_data.df, performance_df = x_data.pf_df, 
-                           criteria_weights = criteria_w, 
-                           threshold_parameters= qpv)
+                      NORAD_ids=sat_TLEs, weather_real = False)
+x_res1 = EOS.solve(x_data, scoring_method=2, solution_method = "DAG",  
+                   criteria_weights = criteria_w, 
+                   threshold_parameters= qpv)
+
 EOS.visualize(x_data, x_res1, 'EOS_example')
 
 df = EOS.evaluate(x_data, x_res1)
@@ -90,7 +90,7 @@ It takes in the following arguments:
 - number_of_requests_0 = 1000, %customer requests in database initially (there is an option to contionously add customers to mimic the effect of a real EOS production where new customers are entering and one over time still wants to ensure that requests doesnt violate an age threshold. The customers are generated based on location distribution which is higher around urbanized areas - this should mimic the actual customer database that EOS companies see or at least mimic the density of requests that optimization problems face.) 
 - NORAD_ids a list of the chosen satellite TLEs. Default is [38755, 40053]  %TLEs for spot 6 and 7 satellites
 - weather_real = False, %whether real cloud coverage data is utilized for the chosen time horizon
-- simplify = False, #whether constraints are simplified based on the principle of inter set constraints - IT IS ONLY VALID IF a LPP solution approach is used.
+- simplify = False, #whether constraints are simplified based on the principle of inter set constraints - IT IS ONLY VALID IF a LPP solution approach is used s.a. GLPK.
 - schedule_start is time of initiation for the schedule horizon. A list of the date entities expressing [year, month, day, hour, minute]. The default is [2021,7,21,9,40].
 - hours_horizon = 8, %duration of planning horizon in hours
 - max_off_nadir_angle = 30, %degrees that satellite can maneuver (or is allowed to still acquire pictures) 
@@ -121,9 +121,9 @@ Two html map objects will be saved in your working directory for inspection, all
 This function contains both the preference integration part (scoring) and the solution approach.
 It takes in the following arguments:
 - scoring_method (can be 1 = TOPSIS, 2 = ELECTRE, 3 = naive scoring method WSA)
-- solution_method (can be "gurobi", "PuLP", "cplex", or "DAG")  
-- criteria_weights (relevant for TOPSIS, ELECTRE, and WSA), [1,0,1,0,0,0,1,1,1])
-- threshold_parameters (relevant for ELECTRE), e.g. np.array([[0,0,1000],[0,0,40],[0,0,40],[0,0,15],[0,0,4],[0,0,20000],[0,0,1], [0,0,1]] Note, it is the indifference, preference, and veto threshold variables assigned for each criteria.
+- solution_method (can be "gurobi", "PuLP", "cplex", "VNS", "random", or "DAG"). Note, for LPP approaches s.a.GLPK, the simplify argument in EOS.scenario() must be FALSE to not create for setwise acquisition constraints. That is, in the maneuvarability constraint to allow for the scenario where x1 cannot be acquired with x2 and x3, but x2 and x3 can be acquired together.
+- criteria_weights (relevant for TOPSIS, ELECTRE, and WSA, e.g. [1,0,1,0,0,0,1,1,1])
+- threshold_parameters (relevant for ELECTRE, e.g. [[0,0,1000],[0,0,40],[0,0,40],[0,0,15],[0,0,4],[0,0,20000],[0,0,1], [0,0,1]]). Note, it is the indifference, preference, and veto threshold variables assigned for each criteria.
 - alpha a scalar, it is the factor with which scores are taken to the power of. It basically represent the level with which one trusts the computed score - it supplies the DM with ratio evaluation ability. Default value is 1 meaning this is negleted.
 - API_key = string of API key for solvers (if they are necessary s.a.for CPLEX.
 
