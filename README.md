@@ -189,6 +189,7 @@ Note, average is often a bad metric in this case, as a few very bad performing a
 
 ## Improvements or suggestions
 ### PLEASE let me know if you have any suggestions (good or bad) to the code - any comments are highly appreciated :-) In terms of added capabilities, I am currently considering:
+ - There is a FutureWarning in a (NumPy?) dataframe function
  - IF there is no feasible requests it will just break down.. so this bug HAS to be fixed!
  - allowing integration of user specified customer database
  - integrate a larger plethora of solution approaches:
