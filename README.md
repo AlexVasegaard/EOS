@@ -101,7 +101,6 @@ x_res2 = EOS.solve(x_data, scoring_method=3, solution_method = "GLPK",  #3=WSA
 EOS.visualize(x_data, x_res2, 'EOS_example')
 
 df2 = EOS.evaluate(x_data, x_res2)
-
 print(df2.solution)
 print(df2.scenario)
 ```
