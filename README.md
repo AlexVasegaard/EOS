@@ -69,12 +69,12 @@ qpv = [[0,  30,  1000],        #area
        [0,  4,   10],          #age
        [0,  0.5,   1]]         #uncertainty
 
-## Example with Extended Longest Path Algoorithm approach
+## Example with Extended Longest Path Algoorithm and ELECTRE-III scoring approach
 x_data = EOS.scenario(seconds_gran=10, number_of_requests_0=1000, 
                       NORAD_ids=sat_TLEs, weather_real = False, 
                       schedule_start = horizon_start, hours_horizon = horizon,
                       simplify = True) #we can simplify the set of constraints when using the ELPA algorithm
-x_res1 = EOS.solve(x_data, scoring_method=2, solution_method = "DAG",  
+x_res1 = EOS.solve(x_data, scoring_method=2, solution_method = "DAG",   #2=ELECTRE-III
                    criteria_weights = criteria_w, 
                    threshold_parameters= qpv)
 
@@ -84,12 +84,12 @@ df1 = EOS.evaluate(x_data, x_res1)
 print(df1.solution)
 print(df1.scenario)
 
-## Example with GLPK solver
+## Example with GLPK solver and the naive weighted sum scoring approach
 x_data = EOS.scenario(seconds_gran=10, number_of_requests_0=1000, 
                       NORAD_ids=sat_TLEs, weather_real = False, 
                       schedule_start = horizon_start, hours_horizon = horizon,
                       simplify = False) #for a non solver the simplify argument must be false, as solution space otherwise is overconstrained
-x_res2 = EOS.solve(x_data, scoring_method=2, solution_method = "GLPK",  
+x_res2 = EOS.solve(x_data, scoring_method=3, solution_method = "GLPK",  #3=WSA
                    criteria_weights = criteria_w, 
                    threshold_parameters= qpv)
 
