@@ -69,6 +69,8 @@ qpv = [[0,  30,  1000],        #area
        [0,  4,   10],          #age
        [0,  0.5,   1]]         #uncertainty
 
+
+
 ### Example with Extended Longest Path Algoorithm and ELECTRE-III scoring approach
 
 x_data = EOS.scenario(seconds_gran=10, number_of_requests_0=1000, 
