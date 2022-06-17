@@ -81,7 +81,7 @@ x_res1 = EOS.solve(x_data, scoring_method=2, solution_method = "DAG",   #2=ELECT
                    criteria_weights = criteria_w, 
                    threshold_parameters= qpv)
 
-EOS.visualize(x_data, x_res1, 'EOS_example')
+EOS.visualize(x_data, x_res1, 'EOS_example') #output is an interactive map called EOS_example.html saved in the wd
 
 df1 = EOS.evaluate(x_data, x_res1)
 print(df1.solution)
@@ -98,7 +98,7 @@ x_res2 = EOS.solve(x_data, scoring_method=3, solution_method = "GLPK",  #3=WSA
                    criteria_weights = criteria_w, 
                    threshold_parameters= qpv)
 
-EOS.visualize(x_data, x_res2, 'EOS_example')
+EOS.visualize(x_data, x_res2, 'EOS_example') #output is an interactive map called EOS_example.html saved in the wd
 
 df2 = EOS.evaluate(x_data, x_res2)
 print(df2.solution)
