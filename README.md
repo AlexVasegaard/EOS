@@ -43,12 +43,15 @@ from EOSpython import EOS
 import pandas as pd                        #The evaluation output is presented as a pd dataframe
 import numpy as np                         #The preference structure is given in numpy arrays
 
-sat_TLEs = [38755, 40053]
+sat_TLEs = [38755, 40053] #spot 6 and 7 - assumed to be heterogenous an capable of acquiring the customer requests in the database
 
-horizon_start = [2021,7,21,9,40] #year,month,date,hour, minut
+horizon_start = [2024,7,11,9,40] #start time for planning window [year, month, date, hour, minute]
 
-horizon = 8 #in hours
+horizon = 8 #planning horizon in hours
 
+## Preference structure
+
+#Corresponding weights related to the selection/scoring of image attempts
                #w
 criteria_w =  [0.05,      #area
                0.1,       #off-nadir angle
@@ -59,6 +62,7 @@ criteria_w =  [0.05,      #area
                0.2,       #age
                0.05]      #uncertainty
 
+#if outranking model is used, then threshold variables q (indifference), p (preference), and v (veto)
        #q,  p,   v
 qpv = [[0,  30,  1000],        #area
        [0,  2,   40],          #off-nadir angle
@@ -73,15 +77,45 @@ qpv = [[0,  30,  1000],        #area
 
 ### Example with Extended Longest Path Algoorithm and ELECTRE-III scoring approach
 
+
+## Create customer database
+database, map_file = EOS.customer_db(number_of_requests_0 = 250)
+
+print(database)
+print(database.info())
+#Note, if map_generation is True, the database can be inspected via the interactive all_requests.html file saved in the wd!
+
+
+## Create scenario
+x_data = EOS.scenario(customer_database = database, m = map_file, 
+                      seconds_gran=10, 
+                      NORAD_ids=sat_TLEs, #the 
+                      weather_real = False, #we can by the use of an API key get real world cloud forecasts from the OWM platform
+                      simplify = True) #we can simplify the set of constraints when using the ELPA algorithm
+#One can also add their own customer database - the structure just have to be the same.
+#The internal map generation function of the scenario module adds the satellite paths and reachable requests for the considered planning horizon.
+
+
+## Generate a solution
+x_res1 = EOS.solve(x_data, scoring_method=2, solution_method = "DAG", criteria_weights_l = criteria_w, threshold_parameters_l= qpv) #2=ELECTRE-III scoring approach
+#Note, the solution method can be either: DAG, GLPK, gurobi, PuLP  - make sure to have the right capitulazation!
+
+EOS.visualize(x_data, x_res1, 'EOS_example') #output is an interactive map called EOS_example.html saved in the wd
+
+df = EOS.evaluate(x_data, x_res1)
+
+print(df.solution)
+print(df.scenario)
+
 x_data = EOS.scenario(seconds_gran=10, number_of_requests_0=1000, 
                       NORAD_ids=sat_TLEs, weather_real = False, 
                       schedule_start = horizon_start, hours_horizon = horizon,
                       simplify = True) #we can simplify the set of constraints when using the ELPA algorithm
-x_res1 = EOS.solve(x_data, scoring_method=2, solution_method = "DAG",   #2=ELECTRE-III
+x_res1 = EOS.solve(x_data, scoring_method=2, solution_method = "DAG",   
                    criteria_weights = criteria_w, 
                    threshold_parameters= qpv)
 
-EOS.visualize(x_data, x_res1, 'EOS_example') #output is an interactive map called EOS_example.html saved in the wd
+EOS.visualize(x_data, x_res1, 'EOS_example') 
 
 df1 = EOS.evaluate(x_data, x_res1)
 print(df1.solution)
@@ -104,6 +138,28 @@ df2 = EOS.evaluate(x_data, x_res2)
 print(df2.solution)
 print(df2.scenario)
 ```
+## EOS.customer_db()
+Is a function that generates a customer database in the format of a pandas dataframe and a html file where one can inspect it. The database is used for the further realization of the problem scenario when we match it with a set of satellites and their operational capabilities as well as the actual planning horizon. The customer database consists of a set of columns that describe the image request for each individual request (rows). 
+The format is: 
+ #   Column             Non-Null Count  Dtype
+---  ------             --------------  -----
+ 0   ID                 250 non-null    object
+ 1   acquired           250 non-null    int64
+ 2   reachable          250 non-null    int64
+ 3   request location   250 non-null    object
+ 4   day                250 non-null    int64
+ 5   area               250 non-null    float64
+ 6   stereo             250 non-null    int64
+ 7   strips             250 non-null    int64
+ 8   duration           250 non-null    float64
+ 9   priority           250 non-null    int64
+ 10  priority mod       250 non-null    int64
+ 11  customer type mod  250 non-null    int64
+ 12  price              250 non-null    int64
+ 13  waiting time       250 non-null    int64
+
+If the user wants to test their own setup - their database has to use the same format.. 
+
 
 ## EOS.scenario() 
 Generates the problem, so it functions as a general pre-processing for the EOS system. 
