@@ -289,7 +289,7 @@ Again, if any of these have your interest, please reach out!
 
 # Appendix
 In this section, some of the assumptions of the pre-processing is explained.
-the distribution of the request database is mainly landbased requests, as these mimic the high and low concentration areas that can occur in an EOS setting, and in the scheduling we are (more or less) only interested in the high distribution areas - as of why the marine requests are omitted. The database is created based on the population density of the earth, and assumes therefore that EOS imagery requests mimic the same density map. See the below figure for one instance:
+the distribution of the request database is mainly landbased requests, as these mimic the high and low concentration areas that can occur in an EOS setting, and in the scheduling we are (more or less) only interested in the high distribution areas - as of why the marine requests are omitted. The database is created based on the population density of the earth, and assumes therefore that EOS imagery requests mimic the same density map. The dataset is generated based on the python script gen_locations.py via the dataset of world cities from the website https://simplemaps.com/data/world-cities. See the below figure for the locations generated based on this procesdure:
 
 ![alt text](generated_requests_start.png)
 
