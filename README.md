@@ -1,298 +1,226 @@
- # EOSpython
-EOSpython is a set of python functions (intended to be a package) that encompases everything within a centralized Earth Observation Satellite scheduling system in terms of Scenario generation, pre-processing, problem setup, solution approach, decision maker preference integration, and visualization.
 
-The DM preferences are introduced through a plethora of Scoring approaches available:
-- modified ELECTRE-III (ordinal)
-- topsis (ordinal)
-- WSA (ordinal)
+# EOSPython
+![Licence](https://img.shields.io/badge/Licence:-MIT-green)
+![Version](https://img.shields.io/badge/Version:-0.50-yellow)
 
-Note, all scoring approaches contain representative variables to elicited information as opposed to using pairwise evaluations.
+The `EOSPython` package enables *scenario generation*, *pre-processing*, *problem setup*, *solution approach decision maker preference integration*, and *visualization*, in the context of Centralized Earth Observation Satellites.
 
-And the solution procedure can be one of the following:
- - GLPK (Large scale LPP solver from cvxopt - does not require API)
- - ELPA (an extended longest path algorithm that can manage extremely large problem scenarios - does not require API)
- - gurobi (large scale LPP solver from gurobi - REQUIRES API)
- - PuLP (large scale LPP solver from PuLP - REQUIRES API)
- - Random greedy approach (can manage large scale problems, but performs very poorly - only really applicable to showcase complexity)
+![](EOS/docs/single_scenario_map.PNG)
 
-Note, some problem scnearios are too large for the LPP solvers to manage. 
+The package supports DM preferences introduced by utilizing one of the following scoring approaches:
+- [Modified ELECTRE-III](https://en.wikipedia.org/wiki/%C3%89LECTRE)
+- [TOPSIS](https://en.wikipedia.org/wiki/TOPSIS)
+- [WSA](MISSING LINK)
 
-![alt text](single_scenario_map.PNG)
+Note that all of the scoring methods utilizes the [Ordinal Priority Approach](https://en.wikipedia.org/wiki/Ordinal_priority_approach). Furthermore, the methods contain representative variables to elicited information as opposed to using pairwise evaluations.
 
-The four main functions are EOSscenario(), EOSsolve(), EOSvisualize(), and EOSevaluate() - an explanation for the functions are given below. 
+The package support the following solution procedures:
+ - GLPK: A large scale LPP solver from *cvxopt*.
+ - ELPA: An extended longest path algorithm that can manage extremely large problem scenarios.
+ - gurobi: A large scale LPP solver from *gurobi* (Requires an API key).
+ - PuLP: A large scale LPP solver from *PuLP* (Requires an API key).
+ - Random greedy approach: Can manage large scale problems, but performs very poorly, and is only really applicable to showcase complexity.
 
-The package dependencies are:
-- numpy, pandas, datetime, requests, random, ephem, math, folium (for a visual html map output), time, scipy, progressbar, ast, timeit, copy
+**Note:** Some problem scenarios are too large for the LPP solvers to manage. 
 
-and depending on whether a free optimization method is used (api may be required):
-- cvxopt, gurobipy, pulp, docplex
+## Dependencies
+The external package dependencies are:
+- `numpy`, `pandas`, `requests`, `skyfield`, `scipy`, `tqdm`, and `folium` (for portable vizualisations).
 
-Real satellite paths are introduced trough their TLE (Go to www.celestrak.com to obtain TLEs, default are Spot 6,7 and Pleiades A and B)
-Also, there is an option to obtain realtime, historic, or generate weather data (cloud coverage) when generating the scenario, this does however require an API key from OpenWeatherMap.org. 
+Additionally, the different solvers also comes with their own dependencies:
+- `cvxopt` ([Free](https://pypi.org/project/cvxopt/))
+- `gurobipy` ([Free/Paid](https://pypi.org/project/gurobipy/))
+- `PuLP` ([Paid](https://pypi.org/project/PuLP/))
+  - [How to configure a solver in PuLP](https://coin-or.github.io/pulp/guides/how_to_configure_solvers.html)
+- `docplex` ([Paid](https://pypi.org/project/docplex/))
+
+Real satellite paths are introduced through their *TLE* (Go to [https://celestrak.org](https://celestrak.org) to obtain TLEs. Default are Spot 6 and 7 with Pleiades A and B). Furthermore, there is an option to generate or obtain real-time, and historic, weather data (cloud coverage) when creating the scenario. This does however require an API key from [OpenWeatherMap](https://openweathermap.org/api) (Free/Paid). This is however a WIP and is not yet implemented. 
+
+## General To-Do
+#### ADD
+- [ ] Docstrings
+- [ ] General Documentation
+- [ ] NSGA-II solver
+- [ ] NSGA-III solver
+- [ ] More evaluation metrics
+- [ ] Sun cover to visualization
+- [ ] Sun elevation to visualization
+
+#### FIX
+- [ ] DAG solver
+- [ ] RANDOM solver
+- [ ] Evaluation function
+- [ ] API integration with OpenWeatherMap
+- [ ] API integration with WeatherBit
+- [ ] No feasible yields exception
+
 
 ## Usage
 
-### install 
+### Install 
 ```python
 pip install EOSpython
 ```
 
-### example
-```python
-from EOSpython import EOS
-import pandas as pd                        #The evaluation output is presented as a pd dataframe
-import numpy as np                         #The preference structure is given in numpy arrays
+#### API Keys
+Create .env file in your project folder. Add the following depending on which API you are trying to reach:
+- OWM_API_KEY="YOUR_OPENWEATHERMAP_API_KEY"
+- WB_API_KEY="YOUR_WEATHEBIT_API_KEY"
+...
 
-sat_TLEs = [38755, 40053] #spot 6 and 7 - assumed to be heterogenous an capable of acquiring the customer requests in the database
+### Functionality
+There exists three main functions: `scenario`, `solve()`, `evaluate`. These provide a high-level interface for simulating and solving the scheduling problem. Furthermore, these are comprised of several sub-functions.
 
-horizon_start = [2024,7,11,9,40] #start time for planning window [year, month, date, hour, minute]
+#### `scenario`
+Generates the problem scenario, such that the object functions as a general pre-processing for the EOS system. This function constructs the linear-programming problem from a database of requests. This database can be generated automatically, but can also be provided as an input.
 
-horizon = 8 #planning horizon in hours
+The function takes the following arguments: 
+| Argument                  | Default Value             | Type               | Description           |
+| ----------------------    | ------------------        | -----              | --------------------- |
+| *db*                      |                           | DataFrame          | Customer database. Will automatically generate on if none is provided to allow for testing. |
+| *NORAD_ids*               |                           | List               | Satellite Catalog Numbers specifying which satellites to utilize. (https://en.wikipedia.org/wiki/Satellite_Catalog_Number) |
+horizon_t0                  |                           | String             | When to start calculating the satellite paths. Must be `YYYY-MM-DD HH:MM:SS`. |
+n_requests                  | `1000`                    | Integer            | The number of requests to generate. Only utilized when no customer database is provided. |
+dt_acq                      | `20`                      | Integer            | Time between image attempts in seconds, i.e. discretization of the satellite path. |
+horizon_dt                  | `8`                       | Integer            | Time to schedule into the future in hourse. Defaults to 8. |
+ona_max                     | `30`                      | Float              | Maximum Off Nadir Angle in degrees, to ensure quality of image in degrees (https://www.euspaceimaging.com/what-is-ona-off-nadir-angle-in-satellite-imagery/). |
+angular_velocity            | `2.5`                     | Float              | The agility of the satellite in degrees per second. |
+cam_resolution              | `1`                       | Float              | Image resolution in m2 per pixel. |
 
-## Preference structure
+Note, the scenarios consist of requests with stereo and strip requirements, which is modeled by the constraints. For a request to be considered, we have defined certain thresholds, namely a maximum cloud coverage of 50 pct. 
 
-#Corresponding weights related to the selection/scoring of image attempts
-               #w
-criteria_w =  [0.05,      #area
-               0.1,       #off-nadir angle
-               0.1,       #sun elevation
-               0.2,       #cloud coverage 
-               0.2,       #priority
-               0.1,       #price
-               0.2,       #age
-               0.05]      #uncertainty
+The "LPP" object, returned by the function, consists of the following:
+| Key                | Type | Description                      |
+| ----               | ---- | -------------------------------- |
+| B                  |      | Repeated attempts constraints    |
+| stereo             |      | Stereo constraints               |
+| req_feasible       |      | Dataframe of feasible requests   |
+| F                  |      | Rotational constraints           |
+| LHS                |      | A in Ax<b                        |
+| RHS                |      | b in Ax<b                        |
+| eLHS               |      | A in Ax=b                        |
+| eRHS               |      | b in Ax=b                        |
 
-#if outranking model is used, then threshold variables q (indifference), p (preference), and v (veto)
-       #q,  p,   v
-qpv = [[0,  30,  1000],        #area
-       [0,  2,   40],          #off-nadir angle
-       [0,  10,  40],          #sun elevation
-       [0,  2,   15],          #cloud coverage 
-       [0,  1,   4],           #priority
-       [0,  100, 20000],       #price
-       [0,  4,   10],          #age
-       [0,  0.5,   1]]         #uncertainty
+The following functions are representative of the `sceneario` call flow. 
 
-
-
-### Example with Extended Longest Path Algoorithm and ELECTRE-III scoring approach
-
-
-## Create customer database
-database, map_file = EOS.customer_db(number_of_requests_0 = 250)
-
-print(database)
-print(database.info())
-#Note, if map_generation is True, the database can be inspected via the interactive all_requests.html file saved in the wd!
-
-
-## Create scenario
-x_data = EOS.scenario(customer_database = database, m = map_file, 
-                      seconds_gran=10, 
-                      NORAD_ids=sat_TLEs, #the 
-                      weather_real = False, #we can by the use of an API key get real world cloud forecasts from the OWM platform
-                      simplify = True) #we can simplify the set of constraints when using the ELPA algorithm
-#One can also add their own customer database - the structure just have to be the same.
-#The internal map generation function of the scenario module adds the satellite paths and reachable requests for the considered planning horizon.
-
-
-## Generate a solution
-x_res1 = EOS.solve(x_data, scoring_method=2, solution_method = "DAG", criteria_weights_l = criteria_w, threshold_parameters_l= qpv) #2=ELECTRE-III scoring approach
-#Note, the solution method can be either: DAG, GLPK, gurobi, PuLP  - make sure to have the right capitulazation!
-
-EOS.visualize(x_data, x_res1, 'EOS_example') #output is an interactive map called EOS_example.html saved in the wd
-
-df = EOS.evaluate(x_data, x_res1)
-
-print(df.solution)
-print(df.scenario)
-
-x_data = EOS.scenario(seconds_gran=10, number_of_requests_0=1000, 
-                      NORAD_ids=sat_TLEs, weather_real = False, 
-                      schedule_start = horizon_start, hours_horizon = horizon,
-                      simplify = True) #we can simplify the set of constraints when using the ELPA algorithm
-x_res1 = EOS.solve(x_data, scoring_method=2, solution_method = "DAG",   
-                   criteria_weights = criteria_w, 
-                   threshold_parameters= qpv)
-
-EOS.visualize(x_data, x_res1, 'EOS_example') 
-
-df1 = EOS.evaluate(x_data, x_res1)
-print(df1.solution)
-print(df1.scenario)
-
-
-### Example with GLPK solver and the naive weighted sum scoring approach
-
-x_data = EOS.scenario(seconds_gran=10, number_of_requests_0=1000, 
-                      NORAD_ids=sat_TLEs, weather_real = False, 
-                      schedule_start = horizon_start, hours_horizon = horizon,
-                      simplify = False) #for a non solver the simplify argument must be false, as solution space otherwise is overconstrained
-x_res2 = EOS.solve(x_data, scoring_method=3, solution_method = "GLPK",  #3=WSA
-                   criteria_weights = criteria_w, 
-                   threshold_parameters= qpv)
-
-EOS.visualize(x_data, x_res2, 'EOS_example') #output is an interactive map called EOS_example.html saved in the wd
-
-df2 = EOS.evaluate(x_data, x_res2)
-print(df2.solution)
-print(df2.scenario)
-```
-## EOS.customer_db()
-Is a function that generates a customer database in the format of a pandas dataframe and a html file where one can inspect it. The database is used for the further realization of the problem scenario when we match it with a set of satellites and their operational capabilities as well as the actual planning horizon. The customer database consists of a set of columns that describe the image request for each individual request (rows). 
+##### `dataGenerator.genCustomerRequests`
+Generates a customer "database" as a pandas dataframe. The "database" is used for further realization of the problem scenario when we match it with a set of satellites and their operational capabilities, as well as the actual planning horizon. The customer "database" consists of a set of columns that describe the image request properties for each individual request. 
 The format is: 
- #   Column             Non-Null Count  Dtype
----  ------             --------------  -----
- 0   ID                 250 non-null    object
- 1   acquired           250 non-null    int64
- 2   reachable          250 non-null    int64
- 3   request location   250 non-null    object
- 4   day                250 non-null    int64
- 5   area               250 non-null    float64
- 6   stereo             250 non-null    int64
- 7   strips             250 non-null    int64
- 8   duration           250 non-null    float64
- 9   priority           250 non-null    int64
- 10  priority mod       250 non-null    int64
- 11  customer type mod  250 non-null    int64
- 12  price              250 non-null    int64
- 13  waiting time       250 non-null    int64
 
-If the user wants to test their own setup - their database has to use the same format.. 
+| Index       | Column       | Type        | Description |
+| ----------- | ------------ | ----------- | -- |
+| 0           | id           | object      | ID as a string, eg. "001", if >100 requests have been generated. |
+| 1           | wgs84        | object      | Position using WGS84 earth model. |
+| 2           | area         | float64     | Area coverage. |
+| 3           | stereo       | bool        | True if stereo image. |
+| 4           | duration     | float64     | Completion time. |
+| 5           | priority     | int64       | Numerical ranking from 1 (highest) to 4 (lowest). |
+| 6           | price        | int64       | Cost of fulfillment. |
+| 7           | age          | int64       | Days since submission. |
+If the user wants to test their own setup their "database" has to use the same format.
+
+##### `utility.utils.getFeasibleAngles`
+Determines at which locations each satellite could possibly complete the request, based on the off-nadir angle.
+
+##### `dataGenerator.genFeasibleRequests`
+Uses the feasible angles and customer database to create a list of satellite requests pair which are feasible. Furthermore, it adds sun elevation and projected weather information to each request as well.
+
+##### `utility.plotting.plotRequests` and `.plotSatPaths`
+Plots the requests and satellite paths.
+
+##### `LPP.createLPPFormulation`
+Create the linear programming formulation, by creating the constraint matrices and realizing the global matrix of constraints. This function considers stereo pairs, max-attempts, maneuverability, image strips. Additionally, it augments the dataframe with feasible requests to accommodate the LPP stereo formulation, adding additional rows to represent the multiple requests. 
 
 
-## EOS.scenario() 
-Generates the problem, so it functions as a general pre-processing for the EOS system. 
-It is seeded so problem scenarios can be replicated across different environments and therefore utilized for evaluating different solution approaches.
-Note, it isnt optimized for speed yet, so it will run rather slow.
-
-
-It takes in the following arguments: 
-- seconds_gran = 20 %The discretisation level of the satellitel path (discrete optimization problem) 
-- number_of_requests_0 = 1000, %customer requests in database initially (there is an option to contionously add customers to mimic the effect of a real EOS production where new customers are entering and one over time still wants to ensure that requests doesnt violate an age threshold. The customers are generated based on location distribution which is higher around urbanized areas - this should mimic the actual customer database that EOS companies see or at least mimic the density of requests that optimization problems face.) 
-- NORAD_ids a list of the chosen satellite TLEs. Default is [38755, 40053]  %TLEs for spot 6 and 7 satellites
-- weather_real = False, %whether real cloud coverage data is utilized for the chosen time horizon
-- simplify = False, #whether constraints are simplified based on the principle of inter set constraints - IT IS ONLY VALID IF a LPP solution approach is used s.a. GLPK.
-- schedule_start is time of initiation for the schedule horizon. A list of the date entities expressing [year, month, day, hour, minute]. The default is [2021,7,21,9,40].
-- hours_horizon = 8, %duration of planning horizon in hours
-- max_off_nadir_angle = 30, %degrees that satellite can maneuver (or is allowed to still acquire pictures) 
-- height_satellite = 694,   %altitude of satellites (in km) - this is in next iteration updated to automatically be calculated 
-- rotation_speed = 30/12, %degrees per second - per https://directory.eoportal.org/web/eoportal/satellite-missions/s/spot-6-7
-- cam_resolution = 1, %m^2 per pixel
-- capacity_limit = 1000000, %in mega byte
-- satellite_swath = 3600, &swath of satellite images 
-- map_generation = True %whether a visualisation should be generated
-- API_key = list of strings with API key(s) for OpenWeatherMap.org for weather forecasts and for historic api.weatherbit.io
-
-Note, the scenarios consist of requests with stereo, strip requirements, which is modeled by the constraints. 
-For a request to be considered we have defined certain thresholds, namely a maximum cloud coverage of 50 pct, 
-
-AND outputs the following:
- - multi_sat_data.LPP is the Linear programming problem Ax<=b where LPP contains:
-   - LPP.LHS - A in the Ax<b
-   - LPP.RHS - b in the Ax<b
-   - LPP.eLHS - A in the Ax=b
-   - LPP.eRHS - b in the Ax=b
- - multi_sat_data.df is the data frame containing all information for the entire problem scenario (for each attempt)
- - multi_sat_data.pf_df is the performance data frame for the relevant (reachable) image attempts
- - multi_sat_data.m is the folium map with relevant problem scenario information
-
-Two html map objects will be saved in your working directory for inspection, all_requests.html and sat_path.html, respectively. (THIS FEATURE SHOULD MAYBE BE REMOVED?)
-
-## EOS.solve() 
+#### `solve` 
 This function contains both the preference integration part (scoring) and the solution approach.
-It takes in the following arguments:
-- scoring_method (can be 1 = TOPSIS, 2 = ELECTRE, 3 = naive scoring method WSA)
-- solution_method (can be "gurobi", "PuLP", "cplex", "VNS", "random", or "DAG"). Note, for LPP approaches s.a.GLPK, the simplify argument in EOS.scenario() must be FALSE to not create for setwise acquisition constraints. That is, in the maneuvarability constraint to allow for the scenario where x1 cannot be acquired with x2 and x3, but x2 and x3 can be acquired together.
-- criteria_weights (relevant for TOPSIS, ELECTRE, and WSA, e.g. [1,0,1,0,0,0,1,1,1])
-- threshold_parameters (relevant for ELECTRE, e.g. [[0,0,1000],[0,0,40],[0,0,40],[0,0,15],[0,0,4],[0,0,20000],[0,0,1], [0,0,1]]). Note, it is the indifference, preference, and veto threshold variables assigned for each criteria.
-- alpha a scalar, it is the factor with which scores are taken to the power of. It basically represent the level with which one trusts the computed score - it supplies the DM with ratio evaluation ability. Default value is 1 meaning this is negleted.
-- API_key = string of API key for solvers (if they are necessary s.a.for CPLEX.
 
-Note, the order with which criteria are presented in the criteria weights and threshold_parameters arguments are:
-- area, 
-- angle, 
-- sun elevation, 
-- cloud cover, 
-- priority, 
-- price, 
-- age, 
-- uncertainty
+The function takes the following arguments:
+| Argument           | Default Value      | Type    | Description                                               |
+| -------------------| ------------------ | ------- | --------------------------------------------------------- |
+| *scoring_method*   | `"TOPSIS"`         | String  | Can be "TOPSIS", "ELECTRE", "WSA" (Naive scoring method") |
+| *solution_method*  | `""PuLP""`         | String  | Can be "gurobi", "PuLP", "cplex", "glpk", "VNS", "random", or "DAG". Note, for LPP approaches s.a. GLPK, the simplify argument in EOS.scenario() must be FALSE to not create for setwise acquisition constraints. That is, in the maneuvarability constraint to allow for the scenario where x1 cannot be acquired with x2 and x3, but x2 and x3 can be acquired together. |
 
-AND outputs the following:
- - multi_sat_testing.x is the binary solution vector illustrating which attempts should be acquired and which should be neglected
- - multi_sat_testing.score is the generated score for each attempt through the introduced preference setting
- - multi_sat_testing.time is the runtime for the solution approach
+The function returns the solution, as a boolean vector, and the corresponding scores. 
 
-## EOS.visualize()
-This funciton puts out an html file in the designated folder containing a folium map of the problem instance and the solution obtained.
-It takes in the following arguments:
- - x_data which is the resulting output from the multi_sat_data() function
- - x_res which is the resulting output from the multi_sat_testing() function
- - name_of_html takes in a string for the name of the html file. Default is 'EOSpython'
+The following functions are representative of the `sceneario` call flow. 
 
-The Output is a saved file in the working folder. 
+##### `scoring.topsis` and `.electre_III`
+The scoring method for the MCDM is selected. If ELECTRE III is selected, threshold criteria must also be provided as a kwarg. To learn more about each scorer, refer to the docstrings.
 
-Note, the visualize builds on the map, which is build in the scenario generation function multi_sat_data(). 
-It is not possible to either build a deep copy of the html file or sequentially add feature groups in the folium package and it is therefore not possible sequentially run multiple different solution schemes without the former computed solution still being visible in the map - The capabiolity of changing the color on the acquisition in multi_sat_testing() is therefore added. Note, this is hopefully being improved for next update.
+##### `solvers.solver_gurobi`, `solver_pulp`, `solver_cplex`, `solver_glpk`, `solver_dag`, `solver_vns`, and `solver_random`
+The solution method for the MCDM is selected. Currently, the DAG and RANDOM solvers are broken. To learn more about each solver, refer to the docstrings. 
 
-## EOS.evaluate()
-This function provides a quick deeper evaluation functionality (than the total score and number of acquisitions provided in the sat_testing() function). The metrics that is showcased are respectively:
- - scenario specific metrics:
-   - number of attempts
-   - number of unique requests
-   - number of constraints in the LPP
-   - average angle on attempts
-   - average prices 
-   - average sun elevation (is more interesting for non-global scenarios)
-   - average cloud cover 
-   - average priority
+#### `evaluate`
+**NOTICE: THIS MIGHT BE BROKEN AND IS NOT TESTED WITH THE LATEST REWORK!**
 
- - Solution specific metrics
-  - total acquisiitons
-  - total profit
-  - average cloud coverage
-  - acqusitions with good cloud cover (<10)
-  - acqusitions with bad cloud cover (>30)
-  - average depointing angle
-  - acquisitions with good off-nadir angle (<10)
-  - acqusitions with bad off-nadir angle (>30)
-  - average priority
-  - priority 1 acquisitions
-  - priority 2 acquisitions
-  - priority 3 acquisitions
-  - priority 4 acquisitions
-  - average sun elevation
-  - total area captured
+This function provides a quick deeper evaluation functionality (than the total score and number of acquisitions provided in the sat_testing() function). The metrics showcased are:
+| Scenario Specific Metrics   | Solution Specific Metrics                    |
+| --------------------------- | -------------------------------------------- |
+| Attempts                    | Acquisitions                                 |
+| Unique Requests             | Profit                                       |
+| Constraints in the LPP      | Cloud Coverage (Average)                     |
+| Angle on attempts (Average) | Acquisitions with Good Cloud Cover (<10)     |
+| Price (Average)             | Acquisitions with Bad Cloud Cover (>30)      |
+| Sun elevation (Average)     | Depointing Angle (Average)                   |
+| Cloud cover (Average)       | Acquisitions with Good Off-Nadir Angle (<10) |
+| Priority (Average)          | Acquisitions with Bad Off-Nadir Angle (>30)  |
+|                             | Priority 1 Acquisitions                      |
+|                             | Priority 2 Acquisitions                      |
+|                             | Priority 3 Acquisitions                      |
+|                             | Priority 4 Acquisitions                      |
+|                             | Sun Elevation (Average)                      |
+|                             | Area Captured                                |
 
-OUTPUT: They can be accesed thrugh the evaluate.scenario and evaluate.solution output, respectively.
-
-Note, average is often a bad metric in this case, as a few very bad performing acquisitions can hide behind a larger set of requests. A better metric is therefore to look at quantiles or certain benchmarks and how many acquisitions with that profile was able to be captured.
-
-## Improvements or suggestions
-### PLEASE let me know if you have any suggestions (good or bad) to the code - any comments are highly appreciated :-) In terms of added capabilities, I am currently considering:
- - There is a FutureWarning in a (NumPy?) dataframe function
- - IF there is no feasible requests it will just break down.. so this bug HAS to be fixed!
- - allowing integration of user specified customer database
- - integrate a larger plethora of solution approaches:
-    - NSGA-II
-    - NSGA-III
-    - other greedy approaches?
- - added visualization traits
- - added evaluation metrics
- - allow usage of evaluation approaches outside of main functions, e.g. for usage in weight and threshold value elicitation
- - improve visualization to e.g. showcase operational criteria also (cloud cover, sun elevation)
-
-Again, if any of these have your interest, please reach out!
+These can be accessed through the `evaluate.scenario` and `evaluate.solution` output. Note, that the average is often a bad metric, as a few very bad performing acquisitions can hide behind a larger set of requests. A better metric is therefore to look at quantiles or certain benchmarks and how many acquisitions with that profile was able to be captured.
 
 
+### Example(s)
+```python
+params = dict( # Scenario Parameters
+       db=None, # Automatically generate a request database
+       n_requests=1000, # Number of request in database
+       NORAD_ids=[38755, 40053],  # Spot 6 and 7
+       horizon_t0="2024-08-29 20:40:00", # Start time
+       dt_acq=20, # Location discretization in seconds
+       horizon_dt=8,  # Planning horizon in hours
+       ona_max=30, # Maximum Off-Nadir Angle
+       angular_velocity=30 / 12, # Satellite agility
+       use_cloud_cover_data=False, # Generate cloud cover, don't use API calls
+       plot_request_map=True, # Plot the request locations on the map
+       plot_satellite_map=True, # Plot the satellite locations on the map
+)
+s = scenario(**params)
+params = dict( # Solution Parameters
+       scoring_method="TOPSIS",
+       solution_method="PULP",
+       criteria_thresholds=pd.DataFrame( # Threshold criteria for Electra scoring
+       {
+              "area": {"q": 0, "p": 50, "v": 1000},
+              "angle": {"q": 2, "p": 5, "v": 40},
+              "sun_elevation": {"q": 2, "p": 5, "v": 40},
+              "cc_est": {"q": 0, "p": 5, "v": 15},
+              "price": {"q": 0, "p": 1000, "v": 10000},
+              "priority": {"q": 0, "p": 1, "v": 2},
+              "age": {"q": 0, "p": 1, "v": 5},
+              "uncertainty": {"q": 0, "p": 2, "v": 5},
+       }
+       ),
+)
+solution = solve(s["LPP"], **params)
+plotSolutions(req_feasible=s["LPP"]["req_feasible"], schedules=solution["solution"], m=s["m"])
+```
 
-# Appendix
+## Improvements or Suggestions
+**PLEASE let me know if you have any suggestions (good or bad) to the code - any comments are highly appreciated :-)** 
+
+## Appendix
 In this section, some of the assumptions of the pre-processing is explained.
-the distribution of the request database is mainly landbased requests, as these mimic the high and low concentration areas that can occur in an EOS setting, and in the scheduling we are (more or less) only interested in the high distribution areas - as of why the marine requests are omitted. The database is created based on the population density of the earth, and assumes therefore that EOS imagery requests mimic the same density map. The dataset is generated based on the python script gen_locations.py via the dataset of world cities from the website https://simplemaps.com/data/world-cities. See the below figure for the locations generated based on this procesdure:
+The distribution of the request database is mainly landbased requests, as these mimic the high and low concentration areas that can occur in an EOS setting, and in the scheduling we are (more or less) only interested in the high distribution areas - as of why the marine requests are omitted. The database is created based on the population density of the earth, and assumes therefore that EOS imagery requests mimic the same density map. See the below figure for one instance:
 
-![alt text](generated_requests_start.png)
+![](EOS/docs/generated_requests_start.png)
 
 In the event that the OWM api keys (and the corresponding subscription to gain access to enough weather data acquitions) are not acquired, then the free option of generating cloud cover observations can be utilised in the weather_real=False argument of the multi_sat_data() functionality. This cloud cover generation generates cloud cover data based on a three level cos function. This is done due to the locality and temporal considerations that apply to the cloud cover of image requests. The output mimics some of the landbased cloud cover metrics that are presented on the NASA cloud report (https://earthobservatory.nasa.gov/images/85843/cloudy-earth), where e.g. 30 pct are close to cloud free observations and a third has to be disregarded due to more than 50 pct cloud coverge. The distribution can be seen below.
 
-![alt text](cloud_gen.png)     ![alt text](cloud_dist.png)
+![](EOS/docs/cloud_gen.png)
+![](EOS/docs/cloud_dist.png)
